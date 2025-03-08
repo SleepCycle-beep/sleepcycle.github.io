@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="https://c.s-microsoft.com/favicon.ico?v2" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" href="style.css" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Sleep Cycles" />
+    <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" />
+    <title>Sleep Cycles</title>
+  </head>
+  <body>
+    <!-- Two background layers for crossfading -->
+    <div id="backgroundLayer1" class="background-layer visible"></div>
+    <div id="backgroundLayer2" class="background-layer"></div>
+
+    <main class="container">
+      <section class="time-input-section">
+        <label for="timeInput">
+          Irei <button id="toggleActionButton" type="button">Acordar</button> às:
+        </label>
+        <input type="time" id="timeInput" required />
+      </section>
+
+      <section class="calculation">
+        <button id="calculateButton">Calcular</button>
+      </section>
+
+      <section id="resultContainer"></section>
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        "use strict";
+
+        const OPTION_ACTION_MAP = {
+          wake: "acordar",
+          sleep: "dormir",
+        };
+
+        // CSS for each background option, with fallback colors and gradients.
+        const BACKGROUND_STYLE_MAP = {
+          wake: `
+            background: #ff7e5f;  /* fallback for old browsers */
+            background: -webkit-linear-gradient(to right, #feb47b, #ff7e5f);  /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to right, #feb47b, #ff7e5f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+          `,
+          sleep: `
+            background: #e96443;  /* fallback for old browsers */
+            background: -webkit-linear-gradient(to right, #904e95, #e96443);  /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to right, #904e95, #e96443); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+          `,
+        };
+
+        // Constants for sleep cycle calculations
+        const CYCLE_DURATION_MINUTES = 90;
+        const MAX_CYCLES = 6;
+        const MILLISECONDS_PER_MINUTE = 60000;
+
+        // Initially, set selected option to "wake"
+        let selectedOption = "wake";
+
+        // Cache DOM elements
+        const toggleActionButton = document.getElementById("toggleActionButton");
+        const timeInput = document.getElementById("timeInput");
+        const calculateButton = document.getElementById("calculateButton");
+        const resultContainer = document.getElementById("resultContainer");
+
+        // Cache background overlay elements
+        const backgroundLayer1 = document.getElementById("backgroundLayer1");
+        const backgroundLayer2 = document.getElementById("backgroundLayer2");
+        let activeBackgroundLayer = backgroundLayer1;
+        let inactiveBackgroundLayer = backgroundLayer2;
+
+        /**
+         * Crossfades the background by updating the inactive layer with the new background
+         * and transitioning its opacity.
+         * @param {string} newBackgroundCSS - The CSS text for the new background.
+         */
+        const crossfadeBackground = (newBackgroundCSS) => {
+          inactiveBackgroundLayer.style.cssText = newBackgroundCSS + inactiveBackgroundLayer.style.cssText;
+          // Force reflow so the browser acknowledges the change.
+          void inactiveBackgroundLayer.offsetWidth;
+          inactiveBackgroundLayer.classList.add("visible");
+          activeBackgroundLayer.classList.remove("visible");
+          [activeBackgroundLayer, inactiveBackgroundLayer] = [inactiveBackgroundLayer, activeBackgroundLayer];
+        };
+
+        /**
+         * Toggles the selected option between wake and sleep.
+         */
+        const toggleOption = () => {
+          selectedOption = selectedOption === "wake" ? "sleep" : "wake";
+          toggleActionButton.textContent =
+            OPTION_ACTION_MAP[selectedOption].charAt(0).toUpperCase() +
+            OPTION_ACTION_MAP[selectedOption].slice(1);
+          // Crossfade to the new background gradient.
+          crossfadeBackground(BACKGROUND_STYLE_MAP[selectedOption]);
+          resultContainer.innerHTML = "";
+        };
+
+        toggleActionButton.addEventListener("click", toggleOption);
+
+        /**
+         * Validates the user input and triggers the sleep cycle calculation.
+         */
+        const handleCalculation = () => {
+          const timeValue = timeInput.value;
+          if (!timeValue) {
+            alert("Por favor, informe um horário válido.");
+            return;
+          }
+          renderSleepCycleTable(timeValue);
+        };
+
+        calculateButton.addEventListener("click", handleCalculation);
+
+        /**
+         * Formats a Date object to a "HH:MM" string.
+         * @param {Date} date - The date to format.
+         * @returns {string} - The formatted time.
+         */
+        const formatTime = (date) => {
+          const hours = date.getHours().toString().padStart(2, "0");
+          const minutes = date.getMinutes().toString().padStart(2, "0");
+          return `${hours}:${minutes}`;
+        };
+
+        /**
+         * Calculates an array of sleep cycle objects based on the base time.
+         * @param {Date} baseTime - The reference time.
+         * @param {number} multiplier - Use 1 for future times ("sleep") and -1 for past times ("wake").
+         * @returns {Array<Object>} - List of sleep cycle objects.
+         */
+        const calculateSleepCycles = (baseTime, multiplier) => {
+          const cycles = [];
+          for (let cycle = 1; cycle <= MAX_CYCLES; cycle++) {
+            const cycleTime = new Date(
+              baseTime.getTime() +
+                multiplier *
+                  cycle *
+                  CYCLE_DURATION_MINUTES *
+                  MILLISECONDS_PER_MINUTE
+            );
+            cycles.push({
+              cycleNumber: cycle,
+              time: cycleTime,
+              sleepHours: (CYCLE_DURATION_MINUTES * cycle) / 60,
+            });
+          }
+          return cycles;
+        };
+
+        /**
+         * Renders a table with sleep cycle times based on user input.
+         * @param {string} timeStr - The base time in "HH:MM" format.
+         */
+        const renderSleepCycleTable = (timeStr) => {
+          const [hours, minutes] = timeStr.split(":").map(Number);
+          const baseTime = new Date();
+          baseTime.setHours(hours, minutes, 0, 0);
+
+          // Determine the multiplier for time calculation based on the selected option.
+          const multiplier = selectedOption === "sleep" ? 1 : -1;
+          const cycles = calculateSleepCycles(baseTime, multiplier);
+
+          let tableHTML = `
+            <table>
+              <thead>
+                <tr>
+                  <th>Ciclos</th>
+                  <th>Hora de <span style="text-transform: capitalize;">${OPTION_ACTION_MAP[selectedOption]}</span></th>
+                  <th>Tempo de sono</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+
+          cycles.forEach(({ cycleNumber, time, sleepHours }) => {
+            tableHTML += `
+              <tr>
+                <td>${cycleNumber}</td>
+                <td>${formatTime(time)}</td>
+                <td>${sleepHours}h</td>
+              </tr>
+            `;
+          });
+
+          tableHTML += `
+              </tbody>
+            </table>
+          `;
+
+          resultContainer.innerHTML = tableHTML;
+        };
+
+        // Set initial background.
+        crossfadeBackground(BACKGROUND_STYLE_MAP[selectedOption]);
+      });
+    </script>
+  </body>
+</html>
