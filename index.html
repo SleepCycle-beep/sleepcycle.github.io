@@ -61,7 +61,7 @@
         const MILLISECONDS_PER_MINUTE = 60000;
 
         // Initially, set selected option to "wake"
-        let selectedOption = "wake";
+        let selectedOption = "sleep";
 
         // Cache DOM elements
         const toggleActionButton = document.getElementById("toggleActionButton");
@@ -108,7 +108,9 @@
          * Validates the user input and triggers the sleep cycle calculation.
          */
         const handleCalculation = () => {
-          const timeValue = timeInput.value;
+          // console.log(timeInput.value);
+          // console.log(typeof timeInput.value);
+          const timeValue = '02:25';
           if (!timeValue) {
             alert("Por favor, informe um horário válido.");
             return;
@@ -116,7 +118,8 @@
           renderSleepCycleTable(timeValue);
         };
 
-        calculateButton.addEventListener("click", handleCalculation);
+        // calculateButton.addEventListener("click", handleCalculation);
+
 
         /**
          * Formats a Date object to a "HH:MM" string.
@@ -199,6 +202,7 @@
 
         // Set initial background.
         crossfadeBackground(BACKGROUND_STYLE_MAP[selectedOption]);
+        handleCalculation();
       });
     </script>
   </body>

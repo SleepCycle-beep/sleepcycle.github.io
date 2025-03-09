@@ -131,24 +131,21 @@ td {
 }
 
 th {
-    background-color: #ffffff70;
     font-family: 'DonutsKing', sans-serif;
+    background-color: #ffffff5e;
 }
 
-tr[data-cycle='5'],
-tr[data-cycle='6'] {
-    background-color: #4CAF50;
-    color: white;
+tbody tr:nth-child(5),
+tbody tr:nth-child(6) {
+    background-color: #2acf3080;
 }
 
-tr[data-cycle='4'] {
-    background-color: #FFC107;
-    color: black;
+tbody tr:nth-child(4) {
+    background-color: #f3b90a80;
 }
 
-tr[data-cycle='1'],
-tr[data-cycle='2'],
-tr[data-cycle='3'] {
-    background-color: #FF5733;
-    color: white;
+tbody tr:nth-child(1),
+tbody tr:nth-child(2),
+tbody tr:nth-child(3) {
+    background-color: #e40e0e80;
 }
