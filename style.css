@@ -7,16 +7,22 @@
 
 @font-face {
     font-family: 'DonutsKing';
-    src: url('fonts/Donuts\ King.otf') format('OpenType');
+    src: url('fonts/Donuts King.otf') format('OpenType');
     font-weight: normal;
     font-style: normal;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
 }
 
@@ -30,7 +36,6 @@ body {
     transition: opacity 0.5s ease;
     z-index: -1;
     opacity: 0;
-    /* Start hidden */
 }
 
 .visible {
@@ -45,9 +50,8 @@ body {
     font: inherit;
     cursor: pointer;
     text-decoration: none;
-    padding: 0;
+    padding: 10px;
     margin: 0 0.25em;
-    padding: 10px 10px 10px 10px;
 }
 
 #timeInput {
@@ -55,7 +59,7 @@ body {
     border: 2px solid #ffffff;
     border-radius: 5px;
     padding: 10px 15px;
-    font-size: 1.1rem;
+    font-size: 1em; /* Tamanho relativo ao container */
     color: #ffffff;
     transition: border-color 0.3s, box-shadow 0.3s;
 }
@@ -71,25 +75,21 @@ body {
 }
 
 .container {
-    background: white;
+    width: clamp(280px, 30vw, 700px);
+    font-size: calc(12px + 0.5vw);
+    margin: 20px auto;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
     text-align: center;
-    min-width: 100px;
-    width: 30vw;
-    font-family: 'Momentz', sans-serif;
-    font-size: 24px;
     color: white;
 
     background: rgba(255, 255, 255, 0.22);
-    border-radius: 16px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10.6px);
     -webkit-backdrop-filter: blur(10.6px);
     border: 1px solid rgba(255, 255, 255, 0.41);
+    font-family: 'Momentz', sans-serif;
 }
-
 
 .options {
     display: flex;
@@ -104,6 +104,7 @@ body {
     background-color: #f0f0f0;
     cursor: pointer;
     transition: background 0.3s;
+    font-size: 1em;
 }
 
 .options button.selected {
@@ -111,8 +112,26 @@ body {
     color: white;
 }
 
-.table-container {
+/* #calculateButton {
+    cursor: pointer;
+    padding: 10px 20px;
+    font-size: 1em;
+    font-family: inherit;
+    border: 2px solid #ffffff;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.4);
+    transition: 0.3s;
+} */
+
+/* #calculateButton:hover {
+    background: rgba(255, 255, 255, 0.6);
+} */
+
+#resultContainer {
     margin-top: 20px;
+}
+
+.table-container {
     overflow-x: auto;
 }
 
@@ -120,14 +139,14 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    font-size: 2vw;
 }
 
 th,
 td {
     border: 1px solid #ddd;
-    padding: 10px;
+    padding: 0.5em;
     text-align: center;
+    font-size: 1em;
 }
 
 th {
