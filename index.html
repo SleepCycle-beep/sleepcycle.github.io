@@ -172,7 +172,7 @@
               <thead>
                 <tr>
                   <th>Ciclos</th>
-                  <th>Hora de <span style="text-transform: capitalize;">${OPTION_ACTION_MAP[selectedOption]}</span></th>
+                  <th>Hora de <span style="text-transform: capitalize;">${OPTION_ACTION_MAP[selectedOption] === OPTION_ACTION_MAP.wake ? 'dormir' : 'acordar' }</span></th>
                   <th>Tempo de sono</th>
                 </tr>
               </thead>
